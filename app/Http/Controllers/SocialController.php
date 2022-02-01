@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Socialite\Facades\Socialite;
@@ -17,26 +16,21 @@ class SocialController extends Controller
 
     public function loginWithFacebook()
     {
-        try {
+        $user = Socialite::driver('facebook')->user();
+        $isUser = User::where('email', $user->email)->first();
 
-            $user = Socialite::driver('facebook')->user();
-            $isUser = User::where('email', $user->email)->first();
-
-            if ($isUser->fb_id !== $user->id) {
-                $isUser->update(['fb_id' => $user->id]);
-            }
-            $verifyUser = User::where('fb_id', $user->id)->first();
-            if ($verifyUser) {
-                Auth::login($verifyUser);
-
-                return redirect()
-                    ->route('dashboard');
-            } else {
-                return $this->register($user);
-            }
-        } catch (Exception $exception) {
-            dd($exception->getMessage());
+        if ($isUser == null) {
+            return $this->register($user);
         }
+
+        if ($isUser->fb_id == null) {
+            $isUser->update(['fb_id' => $user->id]);
+        }
+
+        $loginUser = User::where('fb_id', $user->id)->first();
+        Auth::login($loginUser);
+
+        return $this->redirect();
     }
 
     private function register($user)
@@ -48,9 +42,13 @@ class SocialController extends Controller
             'fb_id' => $user->id,
             'password' => Hash::make($password),
         ]);
-
         Auth::login($createUser);
 
+        return $this->redirect();
+    }
+
+    private function redirect()
+    {
         return redirect()
             ->route('dashboard');
     }

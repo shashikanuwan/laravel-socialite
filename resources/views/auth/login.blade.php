@@ -44,9 +44,11 @@
                 </x-jet-button>
             </div>
 
-            <div class="flex items-center justify-end mt-4">
-                <a class="btn" href="{{ route('auth.facebook') }}" style="background: #3B5499; color: #ffffff; padding: 10px; width: 100%; text-align: center; display: block; border-radius:3px;">
-                    {{__('Login with Facebook')}}
+            <div class="mt-8">
+                <a class="btn" href="{{ route('auth.facebook') }}">
+                    <span class="flex items-center justify-center bg-blue-900 text-white py-3 w-full rounded-md">
+                        {{__('Login with Facebook')}}
+                    </span>
                 </a>
             </div>
         </form>
